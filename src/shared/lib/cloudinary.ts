@@ -8,6 +8,21 @@ cloudinary.config({
   secure: true,
 });
 
+// https://res.cloudinary.com/<cloud>/image/upload/v123/portfolio/abc.png -> portfolio/abc
+function getPublicId(url: string): string | null {
+  if (!url.startsWith("https://res.cloudinary.com/")) return null;
+  const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-z0-9]+$/i);
+  return match ? match[1] : null;
+}
+
+export async function deleteImages(urls: string[]): Promise<void> {
+  const publicIds = urls
+    .map(getPublicId)
+    .filter((id): id is string => id !== null);
+  if (publicIds.length === 0) return;
+  await cloudinary.api.delete_resources(publicIds);
+}
+
 export async function uploadImage(file: File): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer());
 

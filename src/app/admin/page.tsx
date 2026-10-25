@@ -1,6 +1,7 @@
 import { verifySession } from "@/shared/lib/dal";
 import LogoutButton from "@/features/admin-login/ui/LogoutButton";
 import AddProjectForm from "@/features/add-project/ui/AddProjectForm";
+import AdminProjectsList from "@/widgets/admin-projects/ui/AdminProjectsList";
 export const instant = false;
 export default async function AdminPage() {
   await verifySession();
@@ -12,6 +13,7 @@ export default async function AdminPage() {
         <LogoutButton />
       </div>
       <AddProjectForm />
+      <AdminProjectsList />
     </main>
   );
 }

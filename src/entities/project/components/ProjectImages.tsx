@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState, type FC } from "react";
+import ImageLightbox from "./ImageLightbox";
 
 type ProjectImagesProps = {
   images: string[];
@@ -11,6 +12,7 @@ type ProjectImagesProps = {
 const ProjectImages: FC<ProjectImagesProps> = ({ images, title }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const last = images.length - 1;
 
   const go = (i: number) => {
@@ -44,6 +46,12 @@ const ProjectImages: FC<ProjectImagesProps> = ({ images, title }) => {
               fill
               sizes="(max-width: 640px) 100vw, 380px"
               className="object-cover"
+            />
+            <button
+              type="button"
+              onClick={() => setViewerIndex(i)}
+              aria-label={`Открыть скриншот ${i + 1} на весь экран`}
+              className="absolute inset-0 cursor-zoom-in"
             />
           </div>
         ))}
@@ -120,6 +128,18 @@ const ProjectImages: FC<ProjectImagesProps> = ({ images, title }) => {
             ))}
           </div>
         </>
+      )}
+
+      {viewerIndex !== null && (
+        <ImageLightbox
+          images={images}
+          title={title}
+          startIndex={viewerIndex}
+          onClose={(lastIndex) => {
+            setViewerIndex(null);
+            go(lastIndex);
+          }}
+        />
       )}
     </div>
   );

@@ -3,25 +3,17 @@
 import * as z from "zod";
 import { prisma } from "@/shared/lib/prisma";
 import { verifySession } from "@/shared/lib/dal";
-import { uploadImage } from "@/shared/lib/cloudinary";
-
-const ProjectSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(2, { error: "Название — минимум 2 символа" })
-    .max(80, { error: "Название — максимум 80 символов" }),
-  description: z
-    .string()
-    .trim()
-    .min(10, { error: "Описание — минимум 10 символов" })
-    .max(600, { error: "Описание — максимум 600 символов" }),
-  repoLink: z.url({ error: "Введите ссылку, например https://github.com/ник/репозиторий" }),
-});
+import { deleteImages, uploadImage } from "@/shared/lib/cloudinary";
+import { isUniqueViolation } from "@/shared/lib/prisma-errors";
+import {
+  ProjectSchema,
+  validateNewImages,
+  type ProjectFieldErrors,
+} from "@/entities/project/model/project-schema";
 
 export type CreateProjectState =
   | {
-      errors?: { title?: string[]; description?: string[]; repoLink?: string[] };
+      errors?: ProjectFieldErrors;
       message?: string;
       success?: boolean;
     }
@@ -37,39 +29,42 @@ export async function createProject(
     title: formData.get("title"),
     description: formData.get("description"),
     repoLink: formData.get("repoLink"),
+    siteUrl: formData.get("siteUrl") ?? "",
   });
   if (!parsed.success) {
-    return { errors: parsed.error.flatten().fieldErrors };
+    return { errors: z.flattenError(parsed.error).fieldErrors };
   }
-const files = formData
-  .getAll("images")
-  .filter((f): f is File => f instanceof File && f.size > 0);
 
-if (files.length > 6) {
-  return { message: "Можно загрузить не больше 6 картинок" };
-}
-const total = files.reduce((sum, f) => sum + f.size, 0);
-if (total > 4 * 1024 * 1024) {
-  return { message: "Суммарный размер картинок больше 4 МБ — сожмите их или загрузите меньше" };
-}
-for (const f of files) {
-  if (!f.type.startsWith("image/")) {
-    return { message: `«${f.name}» — не картинка` };
+  const files = formData
+    .getAll("images")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+
+  const imagesError = validateNewImages(files, 0);
+  if (imagesError) return { message: imagesError };
+
+  let images: string[];
+  try {
+    images = await Promise.all(files.map(uploadImage));
+  } catch (error) {
+    console.error("createProject: загрузка картинок", error);
+    return {
+      message:
+        "Не удалось загрузить картинки. Проверьте ключи Cloudinary и повторите.",
+    };
   }
-}
-
-let images: string[];
-try {
-  images = await Promise.all(files.map(uploadImage));
-} catch {
-  return { message: "Не удалось загрузить картинки. Проверьте ключи Cloudinary и повторите." };
-}
 
   try {
-    await prisma.project.create({ data: { ...parsed.data, images:images } });
-  } catch {
+    await prisma.project.create({ data: { ...parsed.data, images } });
+  } catch (error) {
+    console.error("createProject: сохранение в базу", error);
+    // картинки уже загружены, а проект не сохранился: убираем, чтобы не копились
+    await deleteImages(images).catch((e) =>
+      console.error("createProject: очистка картинок", e),
+    );
     return {
-      message: "Не удалось сохранить. Возможно, проект с такой ссылкой на репозиторий уже есть.",
+      message: isUniqueViolation(error)
+        ? "Проект с такой ссылкой на репозиторий уже есть. Укажи другую ссылку."
+        : "Не удалось сохранить из-за ошибки на сервере. Попробуй ещё раз; причина записана в логе сервера.",
     };
   }
 

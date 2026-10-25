@@ -22,6 +22,7 @@ model Project {
   title       String
   description String
   repoLink    String   @unique
+  siteUrl     String?
   images      String[]
   id          String   @id @default(cuid())
 }
