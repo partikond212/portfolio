@@ -8,7 +8,7 @@ const AdminProjectsList: FC = async () => {
   const projects = await prisma.project.findMany({ orderBy: { id: "desc" } });
 
   return (
-    <section className="mt-14">
+    <section className="mt-14 min-w-0">
       <h2 className="mb-5 font-display text-xl font-semibold">
         Все проекты ({projects.length})
       </h2>
@@ -16,11 +16,11 @@ const AdminProjectsList: FC = async () => {
       {projects.length === 0 ? (
         <p>Проектов пока нет. Добавь первый формой выше.</p>
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className="flex min-w-0 flex-col gap-3">
           {projects.map((project) => (
             <li
               key={project.id}
-              className="flex flex-wrap items-center gap-4 rounded-2xl bg-paper p-3"
+              className="flex min-w-0 flex-wrap items-center gap-4 overflow-hidden rounded-2xl bg-paper p-3"
             >
               <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-ink/10">
                 {project.images[0] && (
@@ -33,7 +33,7 @@ const AdminProjectsList: FC = async () => {
                   />
                 )}
               </div>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-[1_1_10rem]">
                 <p className="truncate font-semibold">{project.title}</p>
                 <p className="truncate text-sm">{project.repoLink}</p>
               </div>

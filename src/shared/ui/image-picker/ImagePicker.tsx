@@ -165,7 +165,7 @@ export default function ImagePicker({
   const total = items.reduce((sum, item) => sum + item.file.size, 0);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex min-w-0 flex-col gap-3">
       <label htmlFor={name}>{label}</label>
 
       <div
@@ -185,7 +185,7 @@ export default function ImagePicker({
           accept="image/*"
           multiple
           onChange={onChange}
-          className="cursor-pointer text-sm file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-ink file:px-5 file:py-2 file:text-sm file:font-semibold file:text-paper file:transition-colors hover:file:bg-tomato"
+          className="w-full min-w-0 cursor-pointer text-sm file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-ink file:px-5 file:py-2 file:text-sm file:font-semibold file:text-paper file:transition-colors hover:file:bg-tomato"
         />
       </div>
 

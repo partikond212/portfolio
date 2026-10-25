@@ -18,7 +18,7 @@ export default async function EditProjectPage({
   if (!project) notFound();
 
   return (
-    <main className="mx-auto max-w-3xl p-8">
+    <main className="mx-auto w-full max-w-3xl p-5 sm:p-8">
       <Link
         href="/admin"
         className="font-semibold underline decoration-2 underline-offset-4"

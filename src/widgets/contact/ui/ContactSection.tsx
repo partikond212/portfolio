@@ -48,7 +48,7 @@ const ContactSection: FC = () => {
 
       <div
         aria-hidden="true"
-        className="decor-in absolute right-[6%] top-6 hidden size-[140px] md:block"
+        className="decor-in absolute right-[6%] top-6 hidden size-[140px] min-[1100px]:block"
       >
         <svg
           className="spin-slow"

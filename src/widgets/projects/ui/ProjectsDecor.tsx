@@ -5,16 +5,16 @@ const ProjectsDecor: FC = () => {
     <>
       <div
         aria-hidden="true"
-        className="float absolute bottom-24 right-[3%] size-[68px] rounded-[50%_50%_50%_10px] bg-tomato [--r:10deg]"
+        className="float absolute bottom-24 right-[3%] size-[68px] max-md:hidden rounded-[50%_50%_50%_10px] bg-tomato [--r:10deg]"
       />
 
       <div
         aria-hidden="true"
-        className="float absolute bottom-45 left-[4%] size-[46px] rounded-[50%_50%_10px_50%] bg-ink [--r:-8deg]"
+        className="float absolute bottom-45 left-[4%] size-[46px] max-md:hidden rounded-[50%_50%_10px_50%] bg-ink [--r:-8deg]"
       />
       <div
         aria-hidden="true"
-        className="float absolute left-[2.5%] top-30 size-[72px] rounded-full border-[9px] border-ink [--r:0deg]"
+        className="float absolute left-[2.5%] top-30 size-[72px] max-md:hidden rounded-full border-[9px] border-ink [--r:0deg]"
       />
 
       <div
